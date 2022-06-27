@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0">
+	<link rel="icon" href="assets/misc/favicon.png"/>
+	<link rel="stylesheet" href="style.css"/>
+	<xml id="toolbox" style="display: none">
+		<category name="Events" colour="#c7a64c">
+			<block type="on_start"></block>
+			<block type="on_keydown"><value name="NAME"><shadow type="string_value"></shadow></value></block>
+			<block type="on_keyup"><value name="NAME"><shadow type="string_value"></shadow></value></block>
+		</category>
+		<category name="Input" colour="#00bbff">
+			<block type="in_key"><value name="NAME"><shadow type="string_value"></shadow></value></block>
+			<block type="in_allkeys"></block>
+			<block type="in_mousedown"></block>
+			<block type="in_mousehover"></block>
+			<block type="in_mousehover_on"></block>
+			<block type="in_hoverobject"></block>
+		</category>
+		<category name="Control" colour="#9fa55b">
+			<block type="if_then"></block>
+			<block type="if_then_else"></block>
+			<block type="while"><value name="BOOL"><shadow type="true"></shadow></value></block>
+			<block type="break"></block>
+			<block type="foreach"><value name="l"><shadow type="list_value"></shadow></value></block>
+			<block type="foreach_item"></block>
+		</category>
+		<category name="Logic" colour="#5ba55b">
+			<block type="true"></block>
+			<block type="false"></block>
+			<block type="not"></block>
+			<block type="and"></block>
+			<block type="or"></block>
+			<block type="equal"></block>
+		</category>
+		<category name="Number" colour="#5b67a5">
+			<block type="number_value"></block>
+			<block type="number_to"></block>
+			<block type="m_add"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_subtract"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_multiply"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_subdivide"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_equal"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_not_equal"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_big_equal"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_sma_equal"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_big"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="m_sma"><value name="N1"><shadow type="number_value"></shadow></value><value name="N2"><shadow type="number_value"></shadow></value></block>
+			<block type="math_operation"><value name="NUM"><shadow type="number_value"></shadow></value></block>
+			<block type="number_random"></block>
+			<block type="number_random_between"><value name="v1"><shadow type="number_value"></shadow></value><value name="v2"><shadow type="number_value"></shadow></value></block>
+		</category>
+		<category name="String" colour="#5ba58c">
+			<block type="string_value"></block>
+			<block type="string_to"></block>
+			<block type="string_join"><value name="s1"><shadow type="string_value"></shadow></value><value name="s2"><shadow type="string_value"></shadow></value></block>
+			<block type="string_length"><value name="TXT"><shadow type="string_value"></shadow></value></block>
+			<block type="string_equal"><value name="s1"><shadow type="string_value"></shadow></value><value name="s2"><shadow type="string_value"></shadow></value></block>
+			<block type="string_starts"><value name="s1"><shadow type="string_value"></shadow></value><value name="s2"><shadow type="string_value"></shadow></value></block>
+			<block type="string_ends"><value name="s1"><shadow type="string_value"></shadow></value><value name="s2"><shadow type="string_value"></shadow></value></block>
+			<block type="string_split"><value name="s1"><shadow type="string_value"></shadow></value><value name="s2"><shadow type="string_value"></shadow></value></block>
+			<block type="string_char"><value name="s"><shadow type="string_value"></shadow></value><value name="c"><shadow type="number_value"></shadow></value></block>
+			<block type="string_contains"><value name="s"><shadow type="string_value"></shadow></value><value name="c"><shadow type="string_value"></shadow></value></block>
+			<block type="string_search"><value name="s"><shadow type="string_value"></shadow></value><value name="c"><shadow type="string_value"></shadow></value></block>
+			<block type="string_replace"><value name="s"><shadow type="string_value"></shadow></value><value name="c"><shadow type="string_value"></shadow></value><value name="t"><shadow type="string_value"></shadow></value></block>
+			<block type="string_substring"><value name="s"><shadow type="string_value"></shadow></value><value name="i1"><shadow type="number_value"></shadow></value><value name="i2"><shadow type="number_value"></shadow></value></block>
+			<block type="string_case"><value name="s"><shadow type="string_value"></shadow></value></block>
+			<block type="string_s2j"><value name="v"><shadow type="string_value"></shadow></value></block>
+			<block type="string_j2s"><value name="v"><shadow type="dict_value"></shadow></value></block>
+		</category>
+		<category name="List" colour="#a5745b">
+			<block type="list_value"></block>
+			<block type="list_add"></block>
+			<block type="list_set"><value name="index"><shadow type="number_value"></shadow></value></block>
+			<block type="list_get"><value name="index"><shadow type="number_value"></shadow></value></block>
+			<block type="list_remove"><value name="index"><shadow type="number_value"></shadow></value></block>
+			<block type="list_length"></block>
+			<block type="list_contains"></block>
+			<block type="list_search"></block>
+			<block type="list_join"><value name="i"><shadow type="string_value"></shadow></value></block>
+			<block type="list_reverse"></block>
+		</category>
+		<category name="Dictionary" colour="#a55b80">
+			<block type="dict_value"></block>
+			<block type="dict_set"><value name="key"><shadow type="string_value"></shadow></value></block>
+			<block type="dict_get"><value name="key"><shadow type="string_value"></shadow></value></block>
+			<block type="dict_keys"><value name="d"><shadow type="dict_value"></shadow></value></block>
+		</category>
+		<category name="Variables" colour="#5ba5a5">
+			<block type="local_variable"></block>
+			<block type="def_var"></block>
+			<block type="set_var"></block>
+			<block type="get_var"></block>
+			<block type="set_gamevar"></block>
+			<block type="get_gamevar"></block>
+		</category>
+		<category name="Objects" colour="#cb67a5">
+			<block type="object_this"></block>
+			<block type="object_camera"></block>
+			<block type="object_scene"></block>
+			<block type="object_bytag"><value name="NAME"><shadow type="string_value"></shadow></value></block>
+			<block type="object_active_cam"></block>
+			<block type="object_visibility"><value name="v"><shadow type="true"></shadow></value></block>
+			<block type="object_visibility_get"></block>
+			<block type="object_lookat"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="object_lookat2"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="object_clone"></block>
+			<block type="object_add"></block>
+			<block type="object_remove"></block>
+			<block type="object_parent"></block>
+			<block type="object_children"></block>
+			<block type="object_sceneset"><value name="s"><shadow type="string_value"></shadow></value></block>
+		</category>
+		<category name="Materials" colour="#4000ff">
+			<block type="mat_value"></block>
+			<block type="mat_get"></block>
+			<block type="mat_set"></block>
+			<block type="mat_getprop"></block>
+			<block type="mat_setprop"></block>
+		</category>
+		<category name="Colors" colour="#ff0000">
+			<block type="color_hex"><value name="v"><shadow type="string_value"></shadow></value></block>
+			<block type="color_blockly"></block>
+			<block type="color_rgb"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="color_hsl"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+		</category>
+		<category name="Location" colour="#0000ff">
+			<block type="object_setloc"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="object_setxloc"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setyloc"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setzloc"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_getloc"></block>
+			<block type="object_getxloc"></block>
+			<block type="object_getyloc"></block>
+			<block type="object_getzloc"></block>
+			<block type="object_setlocof"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="object_setxlocof"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setylocof"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setzlocof"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_getlocof"></block>
+			<block type="object_getxlocof"></block>
+			<block type="object_getylocof"></block>
+			<block type="object_getzlocof"></block>
+		</category>
+		<category name="Rotation" colour="#ff4400">
+			<block type="object_setrot"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="object_setxrot"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setyrot"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setzrot"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_getrot"></block>
+			<block type="object_getxrot"></block>
+			<block type="object_getyrot"></block>
+			<block type="object_getzrot"></block>
+			<block type="object_setrotof"><value name="v"><shadow type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></shadow></value></block>
+			<block type="object_setxrotof"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setyrotof"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setzrotof"><value name="v"><shadow type="number_value"></shadow></value></block>
+			<block type="object_getrotof"></block>
+			<block type="object_getxrotof"></block>
+			<block type="object_getyrotof"></block>
+			<block type="object_getzrotof"></block>
+		</category>
+		<category name="Scale" colour="#007510">
+			<block type="object_setscl"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setscl_scalar"><value name="x"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setsclof"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></block>
+			<block type="object_setsclof_scalar"><value name="x"><shadow type="number_value"></shadow></value></block>
+		</category>
+		<category name="3D Values" colour="#c4a835">
+			<block type="vec3d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value><value name="z"><shadow type="number_value"></shadow></value></block>
+			<block type="vec2d_value"><value name="x"><shadow type="number_value"></shadow></value><value name="y"><shadow type="number_value"></shadow></value></block>
+			<block type="vec_add"></block>
+			<block type="vec_sub"></block>
+			<block type="vec_mul"></block>
+			<block type="vec_div"></block>
+			<block type="vec_getv"></block>
+			<block type="vec_setv"><value name="v2"><shadow type="number_value"></shadow></value></block>
+			<block type="vec_dist"></block>
+		</category>
+		<category name="Collisions" colour="#000055">
+			<block type="coll_capsule_for"><value name="r"><shadow type="number_value"></shadow></value><value name="h"><shadow type="number_value"></shadow></value></block>
+			<block type="coll_octree_create_for"></block>
+			<block type="coll_capsulewithoctree"></block>
+			<block type="coll_dir"></block>
+		</category>
+		<category name="Audio" colour="#557800">
+			<block type="audio_play"><value name="a"><shadow type="string_value"></shadow></value></block>
+		</category>
+		<category name="Networking" colour="#000000">
+			<block type="net_ws"><value name="addr"><shadow type="string_value"><field name="TXT">ws://localhost:9000</field></shadow></value></block>
+			<block type="net_wssend"><value name="s"><shadow type="string_value"></shadow></value></block>
+			<block type="net_msg"></block>
+			<block type="net_http"><value name="url"><shadow type="string_value"><field name="TXT">https://example.com/</field></shadow></value></block>
+			<block type="net_http_response"></block>
+		</category>
+		<category name="Device" colour="#64a127">
+			<block type="dev_log"><value name="NAME"><shadow type="string_value"></shadow></value></block>
+			<block type="dev_ismobile"></block>
+		</category>
+		<category name="Javascript" colour="#8f7d47">
+			<block type="js_com"></block>
+			<block type="js_rep"></block>
+			<block type="js_joiner"></block>
+			<block type="js_setter"></block>
+			<block type="js_thing"></block>
+			<block type="js_try"></block>
+			<block type="js_trycatch"></block>
+		</category>
+	</xml>
+	<body>
+		<div id="loader">
+			<img id="loader_img" src="assets/misc/loader.png"/>
+		</div>
+		<div id="blockly2">
+			<button id="blocklyClose">Close</button>
+			<div id="blockly">
+			</div>
+		</div>
+		<div id="tsel">
+			<img src="assets/gui/add3.png" id="tseln"/>
+			<img src="assets/gui/close4.png" id="tselx"/>
+			<div id="tselc">
+			</div>
+		</div>
+		<div id="fsel">
+			<img src="assets/gui/close.png" id="fselc"/>
+			<input type="file" id="fselt"/>
+		</div>
+		<div id="fmc">
+			<img src="assets/gui/fmc.png" id="fmci"/>
+		</div>
+		<div id="fm">
+			<img src="assets/gui/add.png" id="fmu"/>
+			<img src="assets/gui/close.png" id="fmx"/>
+			<div id="fmn">
+			</div>
+		</div>
+		<div id="codeeditor">
+			<div id="codeeditor_in"></div>
+			<button id="codeeditor_close">Close</button>
+		</div>
+		<div id="ucons">
+			<img id="ucons_toggle" src="assets/gui/ucons.png" class="ucons_i"/>
+			<div id="ucons_hidden">
+				<img id="ucons_clone" src="assets/gui/ucons_clone.png" class="ucons_i"/>
+			</div>
+		</div>
+		<div id="scriptsel">
+			<img src="assets/gui/close2.png" id="scriptsel_close">
+			<h2>Templates</h2>
+			<div id="scriptsel1"></div>
+			<h2>Existing</h2>
+			<div id="scriptsel2"></div>
+			<h2>Components</h2>
+			<div id="scriptsel3"></div>
+		</div>
+		<div id="settings">
+			<img src="assets/gui/callout_tip.png" id="settings_tip"/>
+			<div id="settings_in">
+				<img src="assets/gui/close4.png" id="s_closeBtn"/>
+				<img src="assets/gui/write.png" id="s_writeBtn"/>
+				<img src="assets/gui/read.png" id="s_readBtn"/>
+				<img src="assets/gui/export.png" id="s_exportBtn"/>
+			</div>
+		</div>
+		<div id="debugger">
+			<img src="assets/gui/run.png" id="startDebug" class="debuggerbtn"/>
+			<img src="assets/gui/settings2.png" id="openSettings" class="debuggerbtn"/>
+			<img src="assets/gui/stop.png" id="stopDebug" style="opacity:0.5;" class="debuggerbtn"/>
+		</div>
+		<div id="confirmTX">
+			<img id="confirmTX1" src="assets/gui/close3.png"/>
+			<img id="confirmTX2" src="assets/gui/check3.png"/>
+		</div>
+		<div id="imgpallete1" class="noselect">
+			Λ Pallete
+		</div>
+		<div id="imgpallete2" class="noselect">
+			
+		</div>
+		<div id="transformmodes"></div>
+		<div class="popup" id="pp1">
+			<img src="assets/gui/close.png" class="popupclose" id="ppc1">
+			<h2 class="noselect">Geometries</h2>
+			<div class="object1" id="o1"><img src="assets/thumbnails/plane.png" class="object2"><p class="object3">Plane</p></div>
+			<div class="object1" id="o2"><img src="assets/thumbnails/box.png" class="object2"><p class="object3">Box</p></div>
+			<div class="object1" id="o3"><img src="assets/thumbnails/circle.png" class="object2"><p class="object3">Circle</p></div>
+			<div class="object1" id="o4"><img src="assets/thumbnails/sphere.png" class="object2"><p class="object3">Sphere</p></div>
+			<div class="object1" id="o5"><img src="assets/thumbnails/pyramid.png" class="object2"><p class="object3">Pyramid</p></div>
+			<div class="object1" id="o6"><img src="assets/thumbnails/torus.png" class="object2"><p class="object3">Torus</p></div>
+			<div class="object1" id="o7"><img src="assets/thumbnails/bean.png" class="object2"><p class="object3">Bean</p></div>
+			<div class="object1" id="o8"><img src="assets/thumbnails/cylinder.png" class="object2"><p class="object3">Cylinder</p></div>
+			<div class="object1" id="o9"><img src="assets/thumbnails/torus.png" class="object2"><p class="object3">Icosphere</p></div>
+			<h2 class="noselect">Misc</h2>
+			<div class="object1" id="o11"><img src="assets/thumbnails/light.png" class="object2"><p class="object3">Point Light</p></div>
+			<div class="object1" id="o12"><img src="assets/thumbnails/light.png" class="object2"><p class="object3">Sun</p></div>
+			<div class="object1" id="o13"><img src="assets/thumbnails/empty.png" class="object2"><p class="object3">Empty</p></div>
+			<div class="object1" id="o14"><img src="assets/thumbnails/camera.png" class="object2"><p class="object3">Camera</p></div>
+			<div class="object1" id="o10"><img src="assets/thumbnails/thing.png" class="object2"><p class="object3">Import GLB</p></div>
+		</div>
+		<div class="popup" id="pp2">
+			<img src="assets/gui/close.png" class="popupclose" id="ppc2">
+			<div id="tabmobdepl"></div>
+		</div>
+		<div id="panel" class="noselect">
+			<p id="panelbar">
+			<img src="assets/gui/add2.png" id="sceneadd"/>
+			<select id="sceneDropdown">
+			</select>
+			</p>
+			<div id="root">
+			</div>
+		</div>
+		<div id="sidemobile" class="noselect">
+			<img src="assets/gui/material2.png" class="sidemobileicon" style="top:0px;" id="tab1q"/>
+			<img src="assets/gui/add3.png" class="sidemobileicon" style="top:72px;" id="sceneadd_mobile"/>
+			<img src="assets/gui/tree.png" class="sidemobileicon" style="top:144px;" id="togglepanel"/>
+			<img src="assets/gui/scripts.png" class="sidemobileicon" style="top:216px;" id="tab2q"/>
+		</div>
+		<div id="side" class="noselect">
+			<div id="sidesel">
+				<img src="assets/gui/material.png" class="selicon" style="top:0px;" id="tab1"/>
+				<img src="assets/gui/scriptssmall.png" class="selicon" style="top:30px;" id="tab2"/>
+			</div>
+			<div id="sidecontent">
+				<p id="sidebar">MAIN</p>
+				<p id="sidebar_edit">
+					<input id="sidebar_txt" type="text" value="SCENE"/>
+				</p>
+				<div id="tab">
+				</div>
+			</div>
+		</div>
+		<div id="content"></div>
+	</body>
+	<script src="howler/howler.js"></script>
+	<script src="jszip/jszip.js"></script>
+	<script src="peerjs/peer.js"></script>
+	<script src="blockly/blockly.min.js"></script>
+	<script src="blockly/blocks.js"></script>
+	<script type="module" src="index.js"></script>
+</html>
+
