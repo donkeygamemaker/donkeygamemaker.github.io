@@ -1038,6 +1038,7 @@ function treePart(elem,obj){
 			part2.addEventListener("click",oc);
 			
 			let part3=document.createElement("img");
+			part3.className="b30";
 			part3.style.margin=mrg;
 			part3.style.display="inline-block";
 			part3.src="assets/gui/add_rel.png";
@@ -1046,6 +1047,7 @@ function treePart(elem,obj){
 			});
 			
 			let part4=document.createElement("img");
+			part4.className="b30";
 			part4.style.display="inline-block";
 			part4.src="assets/gui/trash.png";
 			part4.style.margin=mrg;
@@ -1056,6 +1058,7 @@ function treePart(elem,obj){
 			let part5;
 			if(mobile){
 				part5=document.createElement("img");
+				part5.className="b30";
 				part5.style.display="inline-block";
 				part5.src="assets/gui/clone.png";
 				part5.style.margin=mrg;
@@ -1365,7 +1368,7 @@ function memd(mobile){
 			elem.children[3].children[0].src=astl[tca.material.roughnessMap.userData.src];
 		}
 		elem.children[3].children[1].value=tca.material.roughness;
-		elem.children[4].children[0].value=tca.material.opacity;
+		elem.children[6].children[0].value=tca.material.opacity;
 		
 		//Texture-only
 		

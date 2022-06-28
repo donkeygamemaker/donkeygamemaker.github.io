@@ -17,7 +17,7 @@ body{
 	overflow-y:scroll;
 	font-family:Arial;
 	color:black;
-	padding:4px;
+	padding:8px;
 	white-space:nowrap;
 }
 #panelbar{
@@ -47,7 +47,7 @@ body{
 	top:12%;
 	z-index:4;
 	font-family:Arial;
-	overflow:none;
+	overflow:hidden;
 	overflow-x:none;
 	overflow-y:scroll;
 	padding:20px;
@@ -57,6 +57,8 @@ body{
 	-moz-user-select:none;
 	-ms-user-select:none;
 	user-select:none;
+	perspective:1px;
+	border-radius:15px;
 }
 .popupclose{
 	height:50px;
@@ -69,9 +71,21 @@ body{
 	padding-top:35px;
 }
 .object1{
-	border:2px solid black;
 	display:inline-block;
 	text-align:center;
+	transition:all 0.3s;
+	height:124px;
+	width:104px;
+	font-weight:100;
+}
+.object1:hover{
+	height:124px;
+	width:120px;
+	font-weight:900;
+}
+.object1:active{
+	height:124px;
+	width:104px;
 }
 .object2{
 	width:100px;
@@ -91,32 +105,22 @@ body{
 	overflow-y:scroll;
 	font-family:Arial;
 	color:black;
-	padding:4px;
 	white-space:nowrap;
 	left:calc(100% - 230px);
 }
 #sidebar{
 	background:gray;
 	color:black;
+	margin:0;
+	padding:0;
 }
 #sidebar_txt{
-	width:200px;
+	width:230px;
 }
 #sidebar_edit{
 	display:none;
 }
-#sidesel{
-	position:fixed;
-	height:100%;
-	width:25px;
-	top:calc(100% - 190px);
-}
-.selicon{
-	position:absolute;
-	background:url("assets/gui/tab.png");
-}
 #sidecontent{
-	margin-left:25px;
 	background:#404040;
 	width:100%;
 	height:100%;
@@ -134,6 +138,41 @@ body{
 	left:calc(100% - 80px);
 	padding:8px;
 }
+#tab1{
+	position:absolute;
+	left:0px;
+	height:60px;
+	width:115px;
+	transition:all 0.3s;
+}
+#tab1:hover{
+	height:64px;
+	width:115px;
+}
+#tab1:active{
+	height:60px;
+	width:115px;
+}
+#tab2{
+	position:absolute;
+	left:115px;
+	height:60px;
+	width:115px;
+	transition:all 0.3s;
+}
+#tab2:hover{
+	height:64px;
+	width:115px;
+}
+#tab2:active{
+	height:60px;
+	width:115px;
+}
+#sidetabs{
+	height:60px;
+	margin-bottom:8px;
+}
+
 .sidemobileicon{
 	position:fixed;
 	width:66px;
@@ -142,8 +181,11 @@ body{
 #transformmodes{
 	position:fixed;
 	z-index:3;
-	left:50%;
+	left:calc(50% - 72px);
 	top:50px;
+	border-radius:15px;
+	perspective:1px;
+	overflow: hidden;
 }
 #blockly2{
 	display:block;
@@ -188,7 +230,19 @@ body{
 }
 .debuggerbtn{
 	vertical-align:middle;
+	height:50px;
+	width:50px;
+	transition:all 0.3s;
 }
+.debuggerbtn:hover{
+	height:55px;
+	width:50px;
+}
+.debuggerbtn:active{
+	height:55px;
+	width:45px;
+}
+
 #confirmTX{
 	display:none;
 	position:fixed;
@@ -241,17 +295,24 @@ body{
 	position:fixed;
 	z-index:4;
 	top:55px;
-	left:20%;
-	width:60%;
+	left:calc(50% - 115px);
+	width:230px;
 	text-align:center;
 }
 #settings_in{
 	width:100%;
 	height:calc(100% - 16px);
+	padding-top:6px;
 	background:white;
+	border-radius:15px;
+	perspective:1px;
+	overflow: hidden;
+	vertical-align:middle;
 }
 #settings_tip{
 	vertical-align:middle;
+	display:block;
+	margin-left:calc(50% - 8px);
 }
 #fsel{
 	display:none;
@@ -302,6 +363,9 @@ body{
 	color:white;
 	font-family:Arial;
 	z-index:5;
+	border-radius:15px;
+	perspective:1px;
+	overflow:scroll;
 }
 
 #scriptsel_close{
@@ -343,12 +407,15 @@ body{
 	display:none;
 	position:fixed;
 	z-index:4;
-	width:250px;
+	width:270px;
 	height:75%;
 	background:gray;
 	left:calc(50% - 125px);
 	top:12.5%;
+	overflow: hidden;
 	overflow-y:scroll;
+	border-radius:15px;
+	perspective:1px;
 }
 
 #tselx{
@@ -375,6 +442,19 @@ body{
 
 .tsel_i{
 	display:inline;
+	width:105px;
+	height:105px;
+	margin:9px;
+	transition:all 0.3s;
+}
+
+.tsel_i:hover{
+	width:123px;
+	height:123px;
+	margin:0;
+}
+
+.tsel_i:active{
 	width:105px;
 	height:105px;
 	margin:9px;
@@ -419,19 +499,23 @@ body{
 	font-size:12px;
 	font-family:Arial;
 	word-wrap:break-word;
-	overflow-y:scroll;
+	overflow-y:none;
 }
 
 #fmc{
 	display:none;
 	position:fixed;
 	z-index:3;
-	top:calc(100% - 20px);
+	top:calc(100% - 30px);
 	left:calc(50% - 50px);
-	height:20px;
+	height:30px;
 	width:100px;
+	padding-top:5px;
 	background:rgb(30,30,30);
 	text-align:center;
+	overflow: hidden;
+	perspective:1px;
+	border-radius:15px 15px 1px 1px;
 }
 
 #fmci{
@@ -451,5 +535,43 @@ body{
 	width:40px;
 	height:40px;
 	left:calc(100% - 84px);
+}
+
+#sceneadd{
+	transition:all 0.3s;
+	width:28px;
+	height:28px;
+	margin:1px;
+}
+
+#sceneadd:hover{
+	margin:0;
+	width:30px;
+	height:30px;
+}
+
+#sceneadd:active{
+	margin:2.5px;
+	width:25px;
+	height:25px;
+}
+
+.b30{
+	transition:all 0.3s;
+	width:28px;
+	height:28px;
+	margin:1px;
+}
+
+.b30:hover{
+	margin:0;
+	width:30px;
+	height:30px;
+}
+
+.b30:active{
+	margin:2.5px;
+	width:25px;
+	height:25px;
 }
 
