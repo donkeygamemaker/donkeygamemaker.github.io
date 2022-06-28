@@ -130,7 +130,7 @@ let openScript="";
 let blockEditorOpen=false;
 
 let debugging=false;
-let dcamera;
+let dcamera=camera;
 let dscene;
 let oldscene;
 let scriptScheds=[];
@@ -726,7 +726,7 @@ function animate(){
 
 function startDebugger(){
 	firstrun=true;
-	dcamera=undefined;
+	dcamera=camera;
 	dscene=new THREE.Scene();
 	let p1=[new THREE.Vector3(0,0,-5),new THREE.Vector3(0,0,5)];
 	let p2=[new THREE.Vector3(-5,0,0),new THREE.Vector3(5,0,0)];
