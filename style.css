@@ -380,9 +380,7 @@ body{
 
 .scriptsel_i{
 	width:100%;
-	background:-moz-linear-gradient(top,#aebcbf 0%,#6e7774 50%,#0a0e0a 51%,#0a0809 100%);
-	background:-webkit-linear-gradient(top,#aebcbf 0%,#6e7774 50%,#0a0e0a 51%,#0a0809 100%);
-	background:linear-gradient(to bottom,#aebcbf 0%,#6e7774 50%,#0a0e0a 51%,#0a0809 100%);
+	background:black;
 }
 
 #ucons{
@@ -573,5 +571,77 @@ body{
 	margin:2.5px;
 	width:25px;
 	height:25px;
+}
+
+#welcome_bg{
+	z-index:7;
+	position:fixed;
+	height:100%;
+	width:100%;
+	background:rgba(0,0,0,0.5);
+}
+
+#welcome{
+	position:absolute;
+	left:25%;
+	top:25%;
+	height:50%;
+	width:50%;
+	background:white;
+	perspective:1px;
+	overflow:hidden;
+	border-radius:25px;
+	opacity:1;
+	font-family:Arial;
+	text-align:center;
+	padding:30px;
+	overflow-y:scroll;
+}
+
+#wltl{
+	display:inline;
+	vertical-align:middle;
+	font-size:40px;
+	font-weight:bold;
+}
+
+#wlic{
+	height:100px;
+	vertical-align:middle;
+}
+
+#wlst{
+	width:150px;
+	height:60px;
+}
+
+.example{
+	display:inline-block;
+	line-height:0;
+	width:200px;
+	height:200px;
+	padding-top:10px;
+	padding-right:10px;
+	background:black;
+	perspective:1px;
+	overflow:hidden;
+	border-radius:10px;
+	text-align:center;
+	/*For samba zavatta 29438994 smartphone only (and the chipsets it comes with)*/
+	-omayouaBrowser-optimize:"Yes";
+	-omayouaBrowser-sambaZavattaPhoneChipset:"EAIAOE,IEOEA,IOAEI,EOIEA,OEAII,AEOIAE";
+	-omayouaBrowser-hologramSupported:"Yes";
+	-omayouaBrowser-hologramPosition:5cm 8cm 20cm 93cm 93cm 1cm 8mm 5mm 10mm 5ft 10ft 20ft;
+}
+
+.example2{
+	width:180px;
+	height:150px;
+}
+
+.example3{
+	font-weight:bold;
+	color:white;
+	text-shadow: 2px 3px 5px rgba(0,0,0,0.5);
 }
 

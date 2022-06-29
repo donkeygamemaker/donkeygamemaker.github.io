@@ -631,6 +631,16 @@ function init(){
 			}
 		}
 	})
+	//welcome screen
+	if(mobile){
+		document.getElementById("ver").style.display="none";
+	}
+	document.getElementById("wlst").onclick=function(){
+		document.getElementById("welcome_bg").style.display="none";
+	};
+	/*document.getElementById("ex1").onclick=function(){
+		
+	}*/
 	//first frame
 	animate();
 	//first tree update
@@ -1095,8 +1105,20 @@ function sceneadd(){
 function updtca(){
 	if(tca!=undefined){
 			document.getElementById("sidebar").innerText=String(tca.userData.tag).toUpperCase();
+			if(tca.userData.type=="object"){
+				document.getElementById("tab1").src="assets/gui/mattab.png";
+			}else{
+			if(tca.userData.type=="camera"){
+				document.getElementById("tab1").src="assets/gui/camtab.png";
+			}else{
+			if(tca.userData.type=="light"){
+				document.getElementById("tab1").src="assets/gui/lttab.png";
+			}else{
+				document.getElementById("tab1").src="assets/gui/notab.png";
+			}}}
 	}else{
 			document.getElementById("sidebar").innerText=String(sc[sce].userData.tag).toUpperCase();
+			document.getElementById("tab1").src="assets/gui/sctab.png";
 	}
 	try{
 		if(autoUpdateTab){
@@ -1155,7 +1177,11 @@ function loadTab(tab){
 	elem.innerHTML="";
 	autoUpdateTab=tab==1||tab==2;
 	if(tab==1){
-		elem.appendChild(memd(false));
+		if(tca!=undefined){
+			if(tca.userData.type=="object"){
+				elem.appendChild(memd(false));
+			}
+		}
 	}
 	if(tab==2){
 		elem.appendChild(scripttab(false));
@@ -2143,11 +2169,11 @@ function exportProj(){
 	
 	
 	function finish(){
+		console.log("3");
 		root.generateAsync({type:"blob"}).then(function(data){
 			downloadBlob(data,"Release.zip");
 		},function(e){});
 	}
-	
 	function step(){
 		as+=1;
 		if(as==Object.keys(astl).length){
@@ -2186,6 +2212,9 @@ function exportProj(){
 										data.file(ast,this.response);
 										step();
 									},"blob");
+								}
+								if(Object.keys(astl).length==0){
+									finish();
 								}
 							},"blob");
 						});
