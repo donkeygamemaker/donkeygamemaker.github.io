@@ -2990,7 +2990,7 @@ Blockly.Blocks['dev_log'] = {
 };
 Blockly.JavaScript['dev_log'] = function(block) {
   var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = 'console.log('+value_name+');\n';
+  var code = 'consolelog('+value_name+');\n';
   return code;
 };
 //Mobile
@@ -3184,3 +3184,4 @@ Blockly.JavaScript['audio_play'] = function(block) {
   var code = 'playSound('+value_a+');\n';
   return code;
 };
+
