@@ -484,15 +484,11 @@ function init(){
 		let fselt=document.getElementById("fselt");
 		let fselc=document.getElementById("fselc");
 		fselt.onchange=function(event){
+			try{
 			function onProjLoad(json){
-				try{
-					readProject(json);
-					document.getElementById("fsel").style.display="none";
-					updateFM();
-				}catch(e){
-					console.log("Project could not load");
-					console.log(e);
-				}
+				readProject(json);
+				document.getElementById("fsel").style.display="none";
+				updateFM();
 			}
 			
 			JSZip.loadAsync(event.target.files[0]).then(function(content){
@@ -531,6 +527,9 @@ function init(){
 					}
 				});
 			});
+			}catch(e){
+				console.error("Project could not load: ",e);
+			}
 		};
 		fselc.onclick=function(){
 			fsel.style.display="none";
@@ -713,7 +712,9 @@ function init(){
 			document.getElementById("loader").style.display="none";
 	});
 	//first tab
-	loadTab(1);
+	if(!mobile){
+		loadTab(1);
+	}
 	//update, well, the FM.
 	updateFM();
 }
@@ -1238,6 +1239,7 @@ function loadTabMobile(tab){
 	if(tab==2){
 		elem.appendChild(scripttab());
 	}
+	document.getElementById("pp2").style.display="block";
 }
 
 function reloadTab(){
@@ -2558,7 +2560,6 @@ function updateFM(){
 			uploadFile();
 		};
 	}
-	
 	document.getElementById("fmx").onclick=function(){
 		document.getElementById("fm").style.display="none";
 		document.getElementById("fmc").style.display="block";
