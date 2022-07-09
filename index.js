@@ -163,10 +163,12 @@ let gamevars={};
 let astl={};
 
 let fsel_tar=0;
-let currentEditTexture="map";
 
 let audios={};
 
+let newChild;
+
+let objDiv;
 //Data
 
 const cameraPoints=[
@@ -221,10 +223,10 @@ function init(){
 	renderer=new THREE.WebGLRenderer({antialias:true});
 	renderer.setSize(dww[0],dww[1]);
 	renderer.shadowMap.enabled=true;
-	renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+	renderer.shadowMap.type=THREE.BasicShadowMap;
 	document.getElementById("content").appendChild(renderer.domElement);
 	//Create editor camera
-	camera=new THREE.PerspectiveCamera(30,dww[0]/dww[1],0.1,10000);
+	camera=new THREE.PerspectiveCamera(80,dww[0]/dww[1],0.1,10000);
 	camera.position.set(0,0,20);
 	camera.up.set(0,1,0);
 	//Create editor scene
@@ -239,11 +241,12 @@ function init(){
 	hemi.userData.geo="hemi";
 	sc[0].add(hemi);
 	//Create starter point light
-	dir=new THREE.DirectionalLight(0xffffff,1);
+	dir=new THREE.PointLight(0xffffff,1,20);
 	dir.userData.type="light";
 	dir.userData.tag="Light";
 	dir.userData.scripts=[];
 	dir.userData.geo="light";
+	dir.castShadow=true;
 	setupShadow(dir);
 	sc[0].add(dir);
 	//Create editor grid
@@ -266,10 +269,10 @@ function init(){
 	});
 	//editor controls
 	controls=new OrbitControls(camera,document.getElementById("content"));
-	controls.minDistance=1;
-	controls.maxDistance=500;
+	controls.minDistance=0.1;
+	controls.maxDistance=1000;
 	controls.maxPolarAngle=Math.PI;
-	controls.screenSpacePanning=false;
+	controls.screenSpacePanning=true;
 	controls.rotateSpeed=0.5;
 	
 	controls2=new FlyControls(camera,document.getElementById("content"));
@@ -308,6 +311,8 @@ function init(){
 		document.getElementById("transformmodes").appendChild(document.getElementById("sidebar_edit"));
 	}
 	
+	objDiv=document.getElementById("fmn");
+	
 	if(mobile){
 		document.getElementById("ucons").style.display="block";
 		document.getElementById("ucons_toggle").onclick=function(){
@@ -335,6 +340,11 @@ function init(){
 			}
 		});
 	}
+	
+	document.getElementById("dpar_cancel").onclick=function(){
+		newChild=undefined;
+		document.getElementById("dpar").style.display="none";
+	};
 	
 	document.getElementById("content").addEventListener("click",click);
 	document.getElementById("content").addEventListener("mousemove",m_move);
@@ -379,6 +389,32 @@ function init(){
 			if(event.keyCode==86&&ctrl){
 				if((tca!=undefined)&&(!blockEditorOpen)){
 					cloneObject(clipboard);
+				}
+			}
+			if(event.keyCode==69&&ctrl){
+				if(!blockEditorOpen){
+					if(newChild!=undefined){
+						try{
+							if(newChild.uuid!=tca.uuid){
+								newChild.removeFromParent();
+								tca.add(newChild);
+								newChild=undefined;
+								document.getElementById("dpar").style.display="none";
+								updateTree();
+							}
+						}catch(e){
+							newChild.removeFromParent();
+							sc[sce].add(newChild);
+							newChild=undefined;
+							document.getElementById("dpar").style.display="none";
+							updateTree();
+						}
+					}else{
+						if(tca!=undefined){
+							newChild=tca;
+							document.getElementById("dpar").style.display="block";
+						}
+					}
 				}
 			}
 		}
@@ -449,9 +485,14 @@ function init(){
 		let fselc=document.getElementById("fselc");
 		fselt.onchange=function(event){
 			function onProjLoad(json){
-				readProject(json);
-				document.getElementById("fsel").style.display="none";
-				updateFM();
+				try{
+					readProject(json);
+					document.getElementById("fsel").style.display="none";
+					updateFM();
+				}catch(e){
+					console.log("Project could not load");
+					console.log(e);
+				}
 			}
 			
 			JSZip.loadAsync(event.target.files[0]).then(function(content){
@@ -484,6 +525,9 @@ function init(){
 							let url=window.URL.createObjectURL(blob);
 							loadAst(url,assetstl[i]);
 						});
+					}
+					if(a1==a2){
+							onProjLoad(json);
 					}
 				});
 			});
@@ -522,6 +566,9 @@ function init(){
 				step();
 			},"blob");
 		}
+		if(Object.keys(astl).length==0){
+			finish();
+		}
 	});
 	document.getElementById("s_exportBtn").addEventListener("click",function(){
 		let settingsView=document.getElementById("settings");
@@ -532,6 +579,8 @@ function init(){
 	
 	if(mobile){
 		mobilify();
+	}else{
+		document.getElementById("sidemobile").style.display="none";
 	}
 	
 	let sceneaddbtn;
@@ -655,35 +704,18 @@ function init(){
 			cm.mapping=THREE.EquirectangularReflectionMapping;
 			//set envmap
 			env=cm;
+			scene.environment=env;
 			//default material
-			dmat=new THREE.MeshStandardMaterial({color:0xffffff,envMap:env,metalness:0.5,roughness:0.5});
+			dmat=new THREE.MeshStandardMaterial({color:0xffffff,metalness:0,roughness:1});
 			dmat.castShadow=true;
 			dmat.receiveShadow=true;
 			//complete
 			document.getElementById("loader").style.display="none";
 	});
+	//first tab
+	loadTab(1);
 	//update, well, the FM.
 	updateFM();
-}
-
-function selectImg(){
-	let fsel=document.getElementById("fsel");
-	let fselt=document.getElementById("fselt");
-	let fselc=document.getElementById("fselc");
-	fselt.onchange=function(event){
-		let promise=event.target.files[0].arrayBuffer();
-		promise.then(function(ab){
-			let blob=new Blob([ab],{type:"application/octet-stream"});
-			astl[event.target.files[0].name]=window.URL.createObjectURL(blob);
-			editTexture(tca.material,currentEditTexture);
-			fsel.style.display="none";
-			updateFM();
-		});
-	};
-	fselc.onclick=function(){
-		fsel.style.display="none";
-	};
-	fsel.style.display="block";
 }
 
 function animate(){
@@ -743,6 +775,7 @@ function startDebugger(){
 	dscene.add(new THREE.GridHelper(10,10));
 	dscene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p1),new THREE.LineBasicMaterial({color:0x0000ff})));
 	dscene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p2),new THREE.LineBasicMaterial({color:0xff0000})));
+	document.getElementById("fmn").innerHTML="";
 	
 	let ms=dbgtrav(sc[sce]);
 	dscene.add(ms);
@@ -750,6 +783,7 @@ function startDebugger(){
 	scriptScheds=ejectScripts(dscene);
 	keyspressed={};
 	gamevars={};
+	updateSceneMeta(dscene);
 }
 
 function dbgtrav(o){
@@ -802,6 +836,7 @@ function stopDebugger(){
 	try{
 		websocket.close();
 	}catch(e){}
+	updateFM();
 }
 
 function tickDebugger(){
@@ -1105,24 +1140,32 @@ function sceneadd(){
 function updtca(){
 	if(tca!=undefined){
 			document.getElementById("sidebar").innerText=String(tca.userData.tag).toUpperCase();
-			if(tca.userData.type=="object"){
-				document.getElementById("tab1").src="assets/gui/mattab.png";
-			}else{
-			if(tca.userData.type=="camera"){
-				document.getElementById("tab1").src="assets/gui/camtab.png";
-			}else{
-			if(tca.userData.type=="light"){
-				document.getElementById("tab1").src="assets/gui/lttab.png";
-			}else{
-				document.getElementById("tab1").src="assets/gui/notab.png";
-			}}}
+			if(!mobile){
+				if(tca.userData.type=="object"){
+					document.getElementById("tab1").src="assets/gui/mattab.png";
+				}else{
+				if(tca.userData.type=="camera"){
+					document.getElementById("tab1").src="assets/gui/camtab.png";
+				}else{
+				if(tca.userData.type=="light"){
+					document.getElementById("tab1").src="assets/gui/lttab.png";
+				}else{
+					document.getElementById("tab1").src="assets/gui/notab.png";
+				}}}
+			}
 	}else{
 			document.getElementById("sidebar").innerText=String(sc[sce].userData.tag).toUpperCase();
-			document.getElementById("tab1").src="assets/gui/sctab.png";
+			if(!mobile){
+				document.getElementById("tab1").src="assets/gui/sctab.png";
+			}
 	}
 	try{
 		if(autoUpdateTab){
-			loadTab(ctab);
+			if(mobile){
+				loadTabMobile(ctab);
+			}else{
+				loadTab(ctab);
+			}
 		}
 	}catch(err){}
 }
@@ -1177,14 +1220,10 @@ function loadTab(tab){
 	elem.innerHTML="";
 	autoUpdateTab=tab==1||tab==2;
 	if(tab==1){
-		if(tca!=undefined){
-			if(tca.userData.type=="object"){
-				elem.appendChild(memd(false));
-			}
-		}
+		elem.appendChild(memd());
 	}
 	if(tab==2){
-		elem.appendChild(scripttab(false));
+		elem.appendChild(scripttab());
 	}
 }
 
@@ -1194,17 +1233,10 @@ function loadTabMobile(tab){
 	elem.innerHTML="";
 	let cancel=false;
 	if(tab==1){
-		elem.appendChild(memd(true));
-		cancel=tca==undefined;
-		if(!cancel){
-			cancel=String(tca.userData.type)!="object";
-		}
+		elem.appendChild(memd());
 	}
 	if(tab==2){
-		elem.appendChild(scripttab(true));
-	}
-	if(!cancel){
-		document.getElementById("pp2").style.display="block";
+		elem.appendChild(scripttab());
 	}
 }
 
@@ -1296,154 +1328,231 @@ function mobilify(){
 	document.getElementById("panel").style.display="none";
 }
 
-function memd(mobile){
+function memd(){
 	let elem=document.createElement("div");
 	if(!mobile){
 		elem.style.color="white";
 	}
-	//switch button
-	let switchBtn=document.createElement("select");
-	switchBtn.innerHTML+="<option value='basic'>Plain</option>";
-	switchBtn.innerHTML+="<option value='standard'>Realistic</option>";
-	switchBtn.addEventListener("change",function(){
-		if(this.value=="basic"){
-			tca.material=new THREE.MeshBasicMaterial({color:tca.material.color,
-				transparent:tca.material.transparent,opacity:tca.material.opacity,
-				map:tca.material.map});
-			tca.material.castShadow=true;
-			tca.material.receiveShadow=true;
-		}
-		if(this.value=="standard"){
-			if(tca.material.type!="MeshStandardMaterial"){
-				tca.material=new THREE.MeshStandardMaterial({color:tca.material.color,
-				envMap:env,
-					transparent:tca.material.transparent,opacity:tca.material.opacity,
-					map:tca.material.map});
-				tca.material.castShadow=true;
-				tca.material.receiveShadow=true;
-			}
-		}
-		if(mobile){
-			document.getElementById("pp2").style.display="none";
-		}else{
-			updtca();
-		}
-	});
-	
-	//Basic
-	if(tca.material.type=="MeshBasicMaterial"){
-		switchBtn.value="basic";
+	////Material menu
+	try{
+	if(tca.userData.type=="light"){
 		elem.innerHTML=`
 			<div></div>
-			<p><img class="tex_btn" id="me_colormap" src="assets/gui/notexture.png">
-			Color <input type="color" id="me_color"></p>
-			<p>Opacity <input type="range" min="0" max="1" step="0.01" id="me_opacity" style="width:${mobile?"50%":"100px"};"></p>
+			<p>Color <input type="color" id="me_color"></p>
+			<p>Power <input type="range" min="0" max="4" step="0.1" id="me_power" style="width:${mobile?"50%":"100px"};"></p>
 		`;
 		//get ready
-		if(tca.material.map!=null){
-			elem.children[1].children[0].src=astl[tca.material.map.userData.src];
-		}
-		elem.children[1].children[1].value="#"+tca.material.color.getHexString();
-		elem.children[2].children[0].value=tca.material.opacity;
+		elem.children[1].children[0].value="#"+new THREE.Color(tca.color).getHexString();
+		elem.children[2].children[0].value=tca.intensity;
 		//events
-		elem.children[1].children[0].addEventListener("click",function(){
-			editTexture(tca.material,"color");
-		});
-		elem.children[1].children[1].addEventListener("change",function(){
-			tca.material.color=new THREE.Color(this.value);
+		elem.children[1].children[0].addEventListener("change",function(){
+			tca.color=new THREE.Color(this.value);
 		});
 		elem.children[2].children[0].addEventListener("change",function(){
-			tca.material.opacity=this.value;
-			tca.material.transparent=this.value<1;
+			tca.intensity=this.value;
 		});
 	}
-	//Standard
-	if(tca.material.type=="MeshStandardMaterial"){
-		switchBtn.value="standard";
+	if(tca.userData.type=="object"){
+		//switch button
+		let switchBtn=document.createElement("select");
+		switchBtn.innerHTML+="<option value='basic'>Plain</option>";
+		switchBtn.innerHTML+="<option value='standard'>Realistic</option>";
+		switchBtn.addEventListener("change",function(){
+			if(this.value=="basic"){
+				tca.material=new THREE.MeshBasicMaterial({color:tca.material.color,
+					transparent:tca.material.transparent,opacity:tca.material.opacity,
+					map:tca.material.map});
+			}
+			if(this.value=="standard"){
+				if(tca.material.type!="MeshStandardMaterial"){
+					tca.material=new THREE.MeshStandardMaterial({color:tca.material.color,
+						transparent:tca.material.transparent,opacity:tca.material.opacity,
+						map:tca.material.map});
+					tca.material.castShadow=true;
+					tca.material.receiveShadow=true;
+				}
+			}
+			if(mobile){
+				document.getElementById("pp2").style.display="none";
+			}else{
+				updtca();
+			}
+		});
+		
+		//side
+		let sidesBtn=document.createElement("select");
+		sidesBtn.innerHTML+="<option value='front'>Front side</option>";
+		sidesBtn.innerHTML+="<option value='back'>Inverted</option>";
+		sidesBtn.innerHTML+="<option value='double'>Both sides</option>";
+		sidesBtn.addEventListener("change",function(){
+			if(this.value=="front"){
+				tca.material.side=THREE.FrontSide;
+			}
+			if(this.value=="back"){
+				tca.material.side=THREE.BackSide;
+			}
+			if(this.value=="double"){
+				tca.material.side=THREE.DoubleSide;
+			}
+		});
+		if(tca.material.side==THREE.FrontSide){
+			sidesBtn.value="front";
+		}
+		if(tca.material.side==THREE.BackSide){
+			sidesBtn.value="back";
+		}
+		if(tca.material.side==THREE.DoubleSide){
+			sidesBtn.value="double";
+		}
+		
+		//Basic
+		if(tca.material.type=="MeshBasicMaterial"){
+			switchBtn.value="basic";
+			elem.innerHTML=`
+				<div></div>
+				<p><img class="tex_btn" id="me_colormap" src="assets/gui/notexture.png">
+				Color <input type="color" id="me_color"></p>
+				<p>Opacity <input type="range" min="0" max="1" step="0.01" id="me_opacity" style="width:${mobile?"50%":"100px"};"></p>
+			`;
+			//get ready
+			if(tca.material.map!=null){
+				elem.children[1].children[0].src=astl[tca.material.map.userData.src];
+			}
+			elem.children[1].children[1].value="#"+tca.material.color.getHexString();
+			elem.children[2].children[0].value=tca.material.opacity;
+			//events
+			elem.children[1].children[0].addEventListener("click",function(){
+				editTexture(tca.material,"map");
+			});
+			elem.children[1].children[1].addEventListener("change",function(){
+				tca.material.color=new THREE.Color(this.value);
+			});
+			elem.children[2].children[0].addEventListener("change",function(){
+				tca.material.opacity=this.value;
+				tca.material.transparent=this.value<1;
+			});
+		}
+		//Standard
+		if(tca.material.type=="MeshStandardMaterial"){
+			switchBtn.value="standard";
+			elem.innerHTML=`
+				<div></div>
+				<p><img class="tex_btn" id="me_colormap" src="assets/gui/notexture.png">
+				Color <input type="color" id="me_color"></p>
+				
+				<p><img class="tex_btn" id="me_metalnessmap" src="assets/gui/notexture.png">
+				Metalness <input type="range" min="0" max="1" step="0.01" id="me_metalness" style="width:${mobile?"50%":"100px"};"></p>
+				
+				<p><img class="tex_btn" id="me_roughnessmap" src="assets/gui/notexture.png">
+				Roughness <input type="range" min="0" max="1" step="0.01" id="me_roughness" style="width:${mobile?"50%":"100px"};"></p>
+				
+				<p><img class="tex_btn" id="me_bumpmap" src="assets/gui/notexture.png">
+				Bump</p>
+				
+				<p><img class="tex_btn" id="me_bumpmap" src="assets/gui/notexture.png">
+				Normal</p>
+				
+				<p>Opacity <input type="range" min="0" max="1" step="0.01" id="me_opacity" style="width:${mobile?"50%":"100px"};"></p>
+			`;
+			
+			//get ready
+			
+			if(tca.material.map!=null){
+				elem.children[1].children[0].src=astl[tca.material.map.userData.src];
+			}
+			elem.children[1].children[1].value="#"+tca.material.color.getHexString();
+			if(tca.material.metalnessMap!=null){
+				elem.children[2].children[0].src=astl[tca.material.metalnessMap.userData.src];
+			}
+			elem.children[2].children[1].value=tca.material.metalness;
+			if(tca.material.roughnessMap!=null){
+				elem.children[3].children[0].src=astl[tca.material.roughnessMap.userData.src];
+			}
+			elem.children[3].children[1].value=tca.material.roughness;
+			elem.children[6].children[0].value=tca.material.opacity;
+			
+			//Texture-only
+			
+			if(tca.material.bumpMap!=null){
+				elem.children[4].children[0].src=astl[tca.material.bumpMap.userData.src];
+			}
+			if(tca.material.normalMap!=null){
+				elem.children[5].children[0].src=astl[tca.material.normalMap.userData.src];
+			}
+			
+			//events
+			
+			elem.children[1].children[0].addEventListener("click",function(){
+				editTexture(tca.material,"map");
+			});
+			elem.children[1].children[1].addEventListener("change",function(){
+				tca.material.color=new THREE.Color(this.value);
+			});
+			elem.children[2].children[0].addEventListener("click",function(){
+				editTexture(tca.material,"metalnessMap");
+			});
+			elem.children[2].children[1].addEventListener("change",function(){
+				tca.material.metalness=this.value;
+			});
+			elem.children[3].children[0].addEventListener("click",function(){
+				editTexture(tca.material,"roughnessMap");
+			});
+			elem.children[3].children[1].addEventListener("change",function(){
+				tca.material.roughness=this.value;
+			});
+			elem.children[6].children[0].addEventListener("change",function(){
+				tca.material.opacity=this.value;
+				tca.material.transparent=this.value<1;
+			});
+			
+			//Texture-only
+			
+			elem.children[4].children[0].addEventListener("click",function(){
+				editTexture(tca.material,"bumpMap");
+			});
+			elem.children[5].children[0].addEventListener("click",function(){
+				editTexture(tca.material,"normalMap");
+			});
+			
+		}
+		
+		elem.appendChild(sidesBtn);
+		elem.appendChild(switchBtn);
+	}
+	}catch(e){}
+	////Scene menu
+	if(tca==undefined){
 		elem.innerHTML=`
 			<div></div>
-			<p><img class="tex_btn" id="me_colormap" src="assets/gui/notexture.png">
-			Color <input type="color" id="me_color"></p>
-			
-			<p><img class="tex_btn" id="me_metalnessmap" src="assets/gui/notexture.png">
-			Metalness <input type="range" min="0" max="1" step="0.01" id="me_metalness" style="width:${mobile?"50%":"100px"};"></p>
-			
-			<p><img class="tex_btn" id="me_roughnessmap" src="assets/gui/notexture.png">
-			Roughness <input type="range" min="0" max="1" step="0.01" id="me_roughness" style="width:${mobile?"50%":"100px"};"></p>
-			
-			<p><img class="tex_btn" id="me_bumpmap" src="assets/gui/notexture.png">
-			Bump</p>
-			
-			<p><img class="tex_btn" id="me_bumpmap" src="assets/gui/notexture.png">
-			Normal</p>
-			
-			<p>Opacity <input type="range" min="0" max="1" step="0.01" id="me_opacity" style="width:${mobile?"50%":"100px"};"></p>
+			<p><img class="tex_btn" id="me_bgmap" src="assets/gui/notexture.png">
+			Background
 		`;
 		
-		//get ready
-		
-		if(tca.material.map!=null){
-			elem.children[1].children[0].src=astl[tca.material.map.userData.src];
-		}
-		elem.children[1].children[1].value="#"+tca.material.color.getHexString();
-		if(tca.material.metalnessMap!=null){
-			elem.children[2].children[0].src=astl[tca.material.metalnessMap.userData.src];
-		}
-		elem.children[2].children[1].value=tca.material.metalness;
-		if(tca.material.roughnessMap!=null){
-			elem.children[3].children[0].src=astl[tca.material.roughnessMap.userData.src];
-		}
-		elem.children[3].children[1].value=tca.material.roughness;
-		elem.children[6].children[0].value=tca.material.opacity;
-		
-		//Texture-only
-		
-		if(tca.material.bumpMap!=null){
-			elem.children[4].children[0].src=astl[tca.material.bumpMap.userData.src];
-		}
-		if(tca.material.normalMap!=null){
-			elem.children[5].children[0].src=astl[tca.material.normalMap.userData.src];
-		}
-		
-		//events
-		
 		elem.children[1].children[0].addEventListener("click",function(){
-			editTexture(tca.material,"color");
-		});
-		elem.children[1].children[1].addEventListener("change",function(){
-			tca.material.color=new THREE.Color(this.value);
-		});
-		elem.children[2].children[0].addEventListener("click",function(){
-			editTexture(tca.material,"metalness");
-		});
-		elem.children[2].children[1].addEventListener("change",function(){
-			tca.material.metalness=this.value;
-		});
-		elem.children[3].children[0].addEventListener("click",function(){
-			editTexture(tca.material,"roughness");
-		});
-		elem.children[3].children[1].addEventListener("change",function(){
-			tca.material.roughness=this.value;
-		});
-		elem.children[6].children[0].addEventListener("change",function(){
-			tca.material.opacity=this.value;
-			tca.material.transparent=this.value<1;
+			editTexture(sc[sce].userData,"background",function(){
+				updateSceneMeta();
+			});
 		});
 		
-		//Texture-only
-		
-		elem.children[4].children[0].addEventListener("click",function(){
-			editTexture(tca.material,"bump");
-		});
-		elem.children[5].children[0].addEventListener("click",function(){
-			editTexture(tca.material,"normal");
-		});
-		
+		if(notNull(sc[sce].userData.background)){
+			elem.children[1].children[0].src=astl[sc[sce].userData.background.userData.src];
+		}
 	}
 	
-	elem.appendChild(switchBtn);
-	
 	return(elem);
+}
+
+function notNull(v){
+	return((v!=null)&&(v!=undefined));
+}
+
+function updateSceneMeta(scx=scene){
+	if(notNull(sc[sce].userData.background)){
+		scx.background=sc[sce].userData.background;
+		scx.background.mapping=THREE.EquirectangularReflectionMapping;
+	}else{
+		scx.background=null;
+	}
 }
 
 function switchSceneEd(scenenum){
@@ -1456,6 +1565,8 @@ function switchSceneEd(scenenum){
 	if(!mobile){
 		document.getElementById("sidebar").innerText=String(sc[sce].userData.tag).toUpperCase();
 	}
+	reloadTab();
+	updateSceneMeta();
 }
 
 
@@ -1480,11 +1591,12 @@ function createScene(){
 	hemi.userData.scripts=[];
 	hemi.userData.geo="hemi";
 	sc[sc.length-1].add(hemi);
-	dir=new THREE.DirectionalLight(0xffffff,1);
+	dir=new THREE.PointLight(0xffffff,1,20);
 	dir.userData.type="light";
 	dir.userData.tag="Light";
 	dir.userData.scripts=[];
 	dir.userData.geo="light";
+	dir.castShadow=true;
 	setupShadow(dir);
 	sc[sc.length-1].add(dir);
 	updateSceneDropdown();
@@ -1515,24 +1627,23 @@ function forkMaterialOf(n){
 function scripttab(){
 	function createScriptBaseElem(title){
 		let elem=document.createElement("div");
-		elem.style.width="150px";
-		elem.style.border="1px solid #888888";
 		let elem2=document.createElement("p");
 		elem2.innerText=title;
-		elem2.style.background="rgb(200,200,200)";
-		elem2.style.color="black";
 		elem.appendChild(elem2);
+		elem.className="script_i";
 		return(elem);
 	}
 	function createScriptElem(script,index){
 		let elem=createScriptBaseElem(script);
+		elem.appendChild(document.createElement("br"));
 		
 		let deleteicon=document.createElement("img");
 		let floating=document.createElement("Button");
 		
 		deleteicon.src="assets/gui/trash.png";
 		deleteicon.addEventListener("click",function(){
-			floating.style.display=floating.style.display=="block"?"none":"block";
+			tca.userData.scripts.splice(index,1);
+			if(mobile){loadTabMobile(2);}else{loadTab(2);}
 		})
 		
 		if(mobile){
@@ -1540,21 +1651,6 @@ function scripttab(){
 		}
 		
 		elem.appendChild(deleteicon);
-		
-		floating.innerText="Confirm";
-		floating.style.position="fixed";
-		floating.style.display="none";
-		floating.addEventListener("click",function(){
-			tca.userData.scripts.splice(index,1);
-			if(mobile){loadTabMobile(2);}else{loadTab(2);}
-			floating.style.display="none";
-		});
-		
-		if(mobile){
-			floating.style.fontSize="25px";
-		}
-		
-		elem.appendChild(floating);
 		
 		let blkw="W: If you enable code on this, you will lose access to block editing. (implies for this script only)";
 		
@@ -1854,20 +1950,31 @@ function readProject(json){
 	}
 	updateTree();
 	updateSceneDropdown();
+	updateSceneMeta();
 }
 
 function objectifyJson(json,isScene=false){
 	let obj;
 	if(!isScene){
-		obj=createObjectFromJson(json.type,json.geo);
+		let cprop={color:0xffffff,intensity:1};
+		if(json.color!=undefined){
+			cprop.color=new THREE.Color(json.color);
+			cprop.intensity=json.intensity;
+		}
+		obj=createObjectFromJson(json.type,json.geo,cprop);
 		if(json.material!=undefined){
 			obj.material=materialifyJson(json.material);
 		}
 		transformvalueifyJson(json.transform,obj);
 		obj.userData.tag=json.tag;
+		if(json.color!=undefined){
+			obj.color=new THREE.Color(json.color);
+			obj.intensity=json.intensity;
+		}
 	}else{
 		obj=new THREE.Object3D();
 		obj.userData.tag=json.tag;
+		obj.userData.background=mapifyJson(json.background);
 	}	
 	obj.userData.scripts=json.scripts;
 	for(let i=0;i<json.children.length;i++){
@@ -1882,7 +1989,8 @@ function materialifyJson(json){
 		mat=new THREE.MeshBasicMaterial({
 			color:new THREE.Color(json.color),
 			opacity:json.opacity,
-			transparent:json.transparent
+			transparent:json.transparent,
+			side:json.side
 		});
 		mat.map=mapifyJson(json.map,mat);
 	}
@@ -1893,7 +2001,7 @@ function materialifyJson(json){
 			transparent:json.transparent,
 			metalness:json.metalness,
 			roughness:json.roughness,
-			envMap:env
+			side:json.side
 		});
 		mat.castShadow=true;
 		mat.receiveShadow=true;
@@ -1907,7 +2015,7 @@ function materialifyJson(json){
 }
 
 function mapifyJson(json,mat){
-	if(json!=null){
+	if((json!=null)&&(json!=undefined)){
 		let tex=new THREE.TextureLoader().load(astl[json]);
 		tex.userData.src=json;
 		return(tex);
@@ -1943,6 +2051,9 @@ function jsonifyObject(obj){
 		material:jsonifyMaterial(obj),
 		children:[]
 	};
+	if(notNull(obj.intensity)){json.intensity=Number(obj.intensity);}
+	if(notNull(obj.color)){json.color=obj.color.getHex();}
+	if(notNull(obj.userData.background)){json.background=obj.userData.background.userData.src}
 	for(let i=0;i<obj.children.length;i++){
 		if(obj.children[i].userData.doNotCrawl!=true){
 			json.children.push(jsonifyObject(obj.children[i]));
@@ -1975,14 +2086,15 @@ function jsonifyTransformValues(obj){
 
 function jsonifyMaterial(obj){
 	let json={material:{}};
-	if(obj.material!=undefined){
+	if(obj.material!=undefined&&Object.keys(obj.material).length!=0){
 		if(obj.material.type=="MeshBasicMaterial"){
 			json.material={
 				type:obj.material.type,
 				color:obj.material.color.getHex(),
 				map:jsonifyMap(obj.material.map),
 				opacity:obj.material.opacity,
-				transparent:obj.material.transparent
+				transparent:obj.material.transparent,
+				side:obj.material.side
 			};
 		}
 		if(obj.material.type=="MeshStandardMaterial"){
@@ -1997,14 +2109,15 @@ function jsonifyMaterial(obj){
 				metalness:obj.material.metalness,
 				roughness:obj.material.roughness,
 				opacity:obj.material.opacity,
-				transparent:obj.material.transparent
+				transparent:obj.material.transparent,
+				side:obj.material.side
 			};
 		}
 	}
 	return(json.material);
 }
 
-function createObjectFromJson(type="empty",geo="empty"){
+function createObjectFromJson(type="empty",geo="empty",cprop={color:0xffffff,intensity:1}){
 	let mesh;
 	if(type=="object"&&geo=="plane"){
 		mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),dmat.clone());
@@ -2082,16 +2195,17 @@ function createObjectFromJson(type="empty",geo="empty"){
 		mesh.userData.geo="icosphere";
 	}
 	if(type=="light"&&geo=="light"){
-		mesh=new THREE.DirectionalLight(0xffffff,1);
+		mesh=new THREE.PointLight(cprop.color,cprop.intensity,20);
 		if(sceneadding&&oo){mesh.position.copy(controls.target);sceneadding=false;}
 		mesh.userData.tag="Light";
 		mesh.userData.type="light";
 		mesh.userData.scripts=[];
 		mesh.userData.geo="light";
+		mesh.castShadow=true;
 		setupShadow(mesh);
 	}
 	if(type=="light"&&geo=="hemi"){
-		mesh=new THREE.HemisphereLight(0xffffff,0x333333,0.5);
+		mesh=new THREE.HemisphereLight(cprop.color,0x333333,cprop.intensity);
 		if(sceneadding&&oo){mesh.position.copy(controls.target);sceneadding=false;}
 		mesh.userData.tag="Sun";
 		mesh.userData.type="light";
@@ -2107,7 +2221,7 @@ function createObjectFromJson(type="empty",geo="empty"){
 		mesh.userData.geo="empty";
 	}
 	if(type=="camera"&&geo=="camera"){
-		mesh=new THREE.PerspectiveCamera(30,window.innerWidth/window.innerHeight,0.1,10000);
+		mesh=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,0.1,10000);
 		if(sceneadding&&oo){mesh.position.copy(controls.target);sceneadding=false;}
 		mesh.userData.tag="Camera";
 		mesh.userData.type="camera";
@@ -2169,7 +2283,6 @@ function exportProj(){
 	
 	
 	function finish(){
-		console.log("3");
 		root.generateAsync({type:"blob"}).then(function(data){
 			downloadBlob(data,"Release.zip");
 		},function(e){});
@@ -2336,8 +2449,7 @@ function switchScene(irikdjfekfjewj){
 	}
 }
 
-function editTexture(mat,mapid){
-	currentEditTexture=mapid;
+function editTexture(mat,mapid,onfinish=function(){}){
 	let e=document.getElementById("tsel");
 	let ex=document.getElementById("tselx");
 	let en=document.getElementById("tseln");
@@ -2349,26 +2461,9 @@ function editTexture(mat,mapid){
 	eln.className="tsel_i";
 	eln.src="assets/gui/notexture_big.png";
 	eln.onclick=function(){
-		if(mapid=="color"){
-			mat.map=null;
-			mat.needsUpdate=true;
-		}
-		if(mapid=="metalness"){
-			mat.metalnessMap=null;
-			mat.needsUpdate=true;
-		}
-		if(mapid=="roughness"){
-			mat.roughnessMap=null;
-			mat.needsUpdate=true;
-		}
-		if(mapid=="bump"){
-			mat.bumpMap=null;
-			mat.needsUpdate=true;
-		}
-		if(mapid=="normal"){
-			mat.normalMap=null;
-			mat.needsUpdate=true;
-		}
+		mat[mapid]=null;
+		mat.needsUpdate=true;
+		onfinish();
 		e.style.display="none";
 		reloadTab();
 	};
@@ -2380,33 +2475,13 @@ function editTexture(mat,mapid){
 			el.className="tsel_i";
 			el.src=astl[ast];
 			el.onclick=function(){
-				if(mapid=="color"){
-					mat.map=new THREE.TextureLoader().load(astl[ast]);
-					mat.map.userData.src=ast;
+				mat[mapid]=new THREE.TextureLoader().load(astl[ast],function(){
+					mat[mapid].userData.src=ast;
 					mat.needsUpdate=true;
-				}
-				if(mapid=="metalness"){
-					mat.metalnessMap=new THREE.TextureLoader().load(astl[ast]);
-					mat.metalnessMap.userData.src=ast;
-					mat.needsUpdate=true;
-				}
-				if(mapid=="roughness"){
-					mat.roughnessMap=new THREE.TextureLoader().load(astl[ast]);
-					mat.roughnessMap.userData.src=ast;
-					mat.needsUpdate=true;
-				}
-				if(mapid=="bump"){
-					mat.bumpMap=new THREE.TextureLoader().load(astl[ast]);
-					mat.bumpMap.userData.src=ast;
-					mat.needsUpdate=true;
-				}
-				if(mapid=="normal"){
-					mat.normalMap=new THREE.TextureLoader().load(astl[ast]);
-					mat.normalMap.userData.src=ast;
-					mat.needsUpdate=true;
-				}
-				e.style.display="none";
-				reloadTab();
+					onfinish();
+					e.style.display="none";
+					reloadTab();
+				});
 			}
 			ec.appendChild(el);
 		}
@@ -2416,10 +2491,35 @@ function editTexture(mat,mapid){
 		e.style.display="none";
 	}
 	en.onclick=function(){
-		selectImg();
+		selectImg(mat,mapid,onfinish);
 	}
 	
 	e.style.display="block";
+}
+
+function selectImg(mat,mapid,onfinish){
+	let fsel=document.getElementById("fsel");
+	let fselt=document.getElementById("fselt");
+	let fselc=document.getElementById("fselc");
+	fselt.onchange=function(event){
+		let promise=event.target.files[0].arrayBuffer();
+		promise.then(function(ab){
+			let blob=new Blob([ab],{type:"application/octet-stream"});
+			let fn=event.target.files[0].name;
+			if(astl[fn]!=undefined){
+				alert("W: This texture is already in the project. The name will be changed a bit.");
+				fn+=" ("+String(Math.round(Math.random()*1000))+")";
+			}
+			astl[fn]=window.URL.createObjectURL(blob);
+			editTexture(mat,mapid,onfinish);
+			fsel.style.display="none";
+			updateFM();
+		});
+	};
+	fselc.onclick=function(){
+		fsel.style.display="none";
+	};
+	fsel.style.display="block";
 }
 
 function updateFM(){
@@ -2439,19 +2539,24 @@ function updateFM(){
 		return(fir);
 	}
 	
-	fm.innerHTML="";
-	for(let ast in astl){
-		let src="assets/mimetypes/unknown.png";
-		if(isImage(ast)){
-			src="assets/mimetypes/image.png";
-			if(astl[ast]!=undefined){
-				src=astl[ast];
+	if(!debugging){
+		fm.innerHTML="";
+		for(let ast in astl){
+			let src="assets/mimetypes/unknown.png";
+			if(isImage(ast)){
+				src="assets/mimetypes/image.png";
+				if(astl[ast]!=undefined){
+					src=astl[ast];
+				}
 			}
+			if(isAudio(ast)){
+				src="assets/mimetypes/audio.png";
+			}
+			fm.appendChild(createFir(ast,src));
 		}
-		if(isAudio(ast)){
-			src="assets/mimetypes/audio.png";
-		}
-		fm.appendChild(createFir(ast,src));
+		document.getElementById("fmu").onclick=function(){
+			uploadFile();
+		};
 	}
 	
 	document.getElementById("fmx").onclick=function(){
@@ -2461,9 +2566,6 @@ function updateFM(){
 	document.getElementById("fmc").onclick=function(){
 		document.getElementById("fm").style.display="block";
 		document.getElementById("fmc").style.display="none";
-	};
-	document.getElementById("fmu").onclick=function(){
-		uploadFile();
 	};
 }
 
@@ -2487,6 +2589,10 @@ function uploadFile(then=function(){}){
 	then();
 }
 
+function consolelog(text){
+	objDiv.innerHTML="<p style='color:white;margin-left:20px;'>"+text+"</p>"+objDiv.innerHTML;
+}
+
 function chkExt(fn,ext){
 	return(exts[ext].includes(fn.split(".")[fn.split(".").length-1]));
 }
@@ -2507,14 +2613,11 @@ function playSound(a){
 }
 
 function setupShadow(dir){
-	dir.shadow.camera.left=-400;
-	dir.shadow.camera.right=400;
-	dir.shadow.camera.top=400;
-	dir.shadow.camera.bottom=-400;
-	dir.shadow.mapSize.x=1024;
-	dir.shadow.mapSize.y=1024;
+	dir.shadow.camera.far=500;
+	dir.shadow.camera.near=0.01;
+	dir.shadow.mapSize.width=512;
+	dir.shadow.mapSize.height=512;
 	dir.shadow.bias=-0.005;
-	dir.castShadow=true;
 }
 
 //Bottom

@@ -9,14 +9,14 @@ body{
 	display:block;
 	position:fixed;
 	z-index:3;
-	background:rgba(255,255,255,0.8);
+	background:rgba(64,64,64,0.8);
 	width:230px;
 	height:100%;
 	overflow:none;
 	overflow-x:none;
 	overflow-y:scroll;
 	font-family:Arial;
-	color:black;
+	color:white;
 	padding:8px;
 	white-space:nowrap;
 }
@@ -97,7 +97,6 @@ body{
 #side{
 	position:fixed;
 	z-index:3;
-	background:rgba(255,255,255,0.8);
 	width:230px;
 	height:100%;
 	overflow:none;
@@ -121,7 +120,7 @@ body{
 	display:none;
 }
 #sidecontent{
-	background:#404040;
+	background:rgba(64,64,64,0.8);
 	width:100%;
 	height:100%;
 	position:fixed;
@@ -132,7 +131,7 @@ body{
 	overflow:none;
 	overflow-x:none;
 	overflow-y:scroll;
-	background:rgba(255,255,255,0.8);
+	background:rgba(64,64,64,0.8);
 	width:80px;
 	height:100%;
 	left:calc(100% - 80px);
@@ -323,6 +322,10 @@ body{
 	z-index:5;
 	top:50%;
 	left:25%;
+	padding:10px;
+	perspective:1px;
+	overflow:none;
+	border-radius:5px;
 }
 #fselc{
 	vertical-align:middle;
@@ -381,6 +384,14 @@ body{
 .scriptsel_i{
 	width:100%;
 	background:black;
+}
+
+.scriptsel_i:hover{
+	background:rgb(20,20,20);
+}
+
+.scriptsel_i:active{
+	background:rgb(200,200,200);
 }
 
 #ucons{
@@ -472,7 +483,7 @@ body{
 	width:calc(100% - 468px);
 	top:70%;
 	height:30%;
-	background:rgb(20,20,20);
+	background:rgb(20,20,20,0.8);
 	overflow-y:scroll;
 }
 
@@ -643,5 +654,46 @@ body{
 	font-weight:bold;
 	color:white;
 	text-shadow: 2px 3px 5px rgba(0,0,0,0.5);
+}
+
+.script_i{
+	padding-top:8px;
+	padding-bottom:8px;
+	padding-left:15px;
+	background:rgb(127,127,127);
+	perspective:1px;
+	overflow:hidden;
+	border-radius:10px;
+	transition:all 0.3s;
+}
+
+.script_i:hover{
+	padding-top:12px;
+	padding-bottom:12px;
+	background:rgb(200,200,200);
+}
+
+.script_i:active{
+	padding-top:6px;
+	padding-bottom:6px;
+	background:rgb(230,230,230);
+}
+
+#dpar{
+	display:none;
+	position:fixed;
+	z-index:4;
+	left:10%;
+	width:80%;
+	height:50px;
+	top:calc(100% - 50px);
+	background:white;
+	text-align:center;
+	vertical-align:middle;
+	font-family:Arial;
+	font-size:20px;
+	perspective:1px;
+	overflow:hidden;
+	border-radius:10px;
 }
 

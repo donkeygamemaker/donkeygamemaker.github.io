@@ -77,7 +77,6 @@ function init(){
 	setLoader(0);
 	assetProg(0);
 }
-
 function animate(){
 	requestAnimationFrame(animate);
 	if(dfbgs!=undefined){
@@ -92,6 +91,7 @@ function animate(){
 function allLoaded(){
 	env=assets["sky.jpeg"];
 	env.mapping=THREE.EquirectangularReflectionMapping;
+	scene.environment=env;
 	switchScene(meta.mainScene);
 	tick();
 	animate();
@@ -227,7 +227,12 @@ function parseScene(scn,n){
 function objectifyJson(json,isScene=false){
 	let obj;
 	if(!isScene){
-		obj=createObjectFromJson(json.type,json.geo);
+		let cprop={color:0xffffff,intensity:1};
+		if(json.color!=undefined){
+			cprop.color=new THREE.Color(json.color);
+			cprop.intensity=json.intensity;
+		}
+		obj=createObjectFromJson(json.type,json.geo,cprop);
 		if(json.material!=undefined){
 			obj.material=materialifyJson(json.material);
 		}
@@ -236,6 +241,7 @@ function objectifyJson(json,isScene=false){
 	}else{
 		obj=new THREE.Object3D();
 		obj.userData.tag=json.tag;
+		obj.userData.background=mapifyJson(json.background);
 	}	
 	obj.userData.scripts=json.scripts;
 	for(let i=0;i<json.children.length;i++){
@@ -256,7 +262,8 @@ function materialifyJson(json){
 		mat=new THREE.MeshBasicMaterial({
 			color:new THREE.Color(json.color),
 			opacity:json.opacity,
-			transparent:json.transparent
+			transparent:json.transparent,
+			side:json.side
 		});
 		mat.map=mapifyJson(json.map,mat);
 	}
@@ -267,7 +274,7 @@ function materialifyJson(json){
 			transparent:json.transparent,
 			metalness:json.metalness,
 			roughness:json.roughness,
-			envMap:env
+			side:json.side
 		});
 		mat.castShadow=true;
 		mat.receiveShadow=true;
@@ -284,7 +291,7 @@ function mapifyJson(json,mat){
 	return(assets[json]);
 }
 
-function createObjectFromJson(type="empty",geo="empty"){
+function createObjectFromJson(type="empty",geo="empty",cprop){
 	let mesh;
 	if(type=="object"&&geo=="plane"){
 		mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),dmat.clone());
@@ -350,15 +357,16 @@ function createObjectFromJson(type="empty",geo="empty"){
 		mesh.userData.geo="icosphere";
 	}
 	if(type=="light"&&geo=="light"){
-		mesh=new THREE.DirectionalLight(0xffffff,1);
+		mesh=new THREE.PointLight(cprop.color,cprop.intensity,20);
 		mesh.userData.tag="Light";
 		mesh.userData.type="light";
 		mesh.userData.scripts=[];
 		mesh.userData.geo="light";
+		mesh.castShadow=true;
 		setupShadow(mesh);
 	}
 	if(type=="light"&&geo=="hemi"){
-		mesh=new THREE.HemisphereLight(0xffffff,0x333333,0.5);
+		mesh=new THREE.HemisphereLight(cprop.color,0x333333,cprop.intensity);
 		mesh.userData.tag="Sun";
 		mesh.userData.type="light";
 		mesh.userData.scripts=[];
@@ -372,7 +380,7 @@ function createObjectFromJson(type="empty",geo="empty"){
 		mesh.userData.geo="empty";
 	}
 	if(type=="camera"&&geo=="camera"){
-		mesh=new THREE.PerspectiveCamera(30,window.innerWidth/window.innerHeight,0.1,10000);
+		mesh=new THREE.PerspectiveCamera(80,window.innerWidth/window.innerHeight,0.1,10000);
 		mesh.userData.tag="Camera";
 		mesh.userData.type="camera";
 		mesh.userData.scripts=[];
@@ -392,12 +400,26 @@ function switchScene(name){
 	}
 	scene.add(scenes[name]);
 	sce=name;
-	scriptScheds=ejectScripts(scenes[name]);
+	scriptScheds=ejectScripts(scenes[sce]);
 	dfbgs=scenes[sce];
 	firstrun=true;
 	gamevars={};
 	keyspressed={};
 	gamevars={};
+	updateSceneMeta();
+}
+
+function notNull(v){
+	return((v!=null)&&(v!=undefined));
+}
+
+function updateSceneMeta(){
+	if(notNull(scenes[sce].userData.background)){
+		scene.background=scenes[sce].userData.background;
+		scene.background.mapping=THREE.EquirectangularReflectionMapping;
+	}else{
+		scene.background=null;
+	}
 }
 
 function ejectScripts(scene){
@@ -587,6 +609,10 @@ function setupShadow(dir){
 	dir.shadow.mapSize.y=1024;
 	dir.shadow.bias=-0.005;
 	dir.castShadow=true;
+}
+
+function consolelog(text){
+	console.log(text);
 }
 
 document.addEventListener("DOMContentLoaded",init);
